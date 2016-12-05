@@ -1,0 +1,81 @@
+<!--In het begin wouden we gebruik maken van een array waarin we al de gegevens
+pushte. Dit bleek dan op 1 record komen te staan waardoor we de json namen zijn 
+gaan gebruiken!-->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Opdracht 7: JQuery & ajax request</title>
+    <script src="http://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript">
+        var settings = {
+            "async": true,
+            "crossDomain": true,
+            "url": "https://web-ims.thomasmore.be/datadistribution/API/2.0/drones?format=json",
+            "method": "GET",
+            "dataType": 'json',
+            "headers": {
+                "authorization": "Basic aW1zOno1MTJtVDRKeVgwUExXZw==",
+                "cache-control": "no-cache",
+                "postman-token": "9d25c54e-589e-62be-2923-97592800ce66"
+            }
+        };
+        /*
+        drone_name = [];
+        drone_mac = [];
+        file_id = [];
+        file_firstr = [];
+        file_lastr = [];
+        */
+        $.ajax(settings)
+            .done(function(response) {
+                for (var x = 0; x < response.length; x++) {
+                    settings.url = response[x]['url'];
+                    $.ajax(settings).done(function(response_1) {
+                        settings.url = 'https://web-ims.thomasmore.be/datadistribution/API/2.0/files?drone_id.is=' + response_1['id'] + '&format=json';
+                        $.ajax(settings).done(function(response_2) {
+                            for (var y = 0; y < response_2.length; y++) {
+                                settings.url = 'https://web-ims.thomasmore.be/datadistribution/API/2.0/files/' + response_2[y]['id'] + '?format=json';
+                                // Deze url kan je vervangen door response_2[y]['url']
+                                  $.ajax(settings).done(function(response_3) {
+                                       /*drone_name.push(response_1['name']);
+                                       drone_mac.push(response_1['mac_address']);
+                                       file_id.push(response_3['id']);
+                                       file_firstr.push(response_3['date_first_record']);
+                                       file_lastr.push(response_3['date_last_record']);*/
+                                        $("#tabel").append('<tr>' +
+                                        '<td>'+response_1.name+'</td>' +
+                                        '<td>'+response_1.mac_address+'</td>' +
+                                        '<td>'+response_3.id+'</td>' +
+                                        '<td>'+response_3.date_first_record+'</td>' +
+                                        '<td>'+response_3.date_last_record+'</td></tr>');
+                                       });
+                             };
+                        });
+                    });
+                };
+            });
+    </script>
+</head>
+
+<body>
+    <style media="screen">
+        table, th, td {
+            border: 1px solid black;
+        }
+    </style>
+<div>
+    <h1>Oprdacht 7: JQuery en ajax</h1>
+    <table id="tabel">
+        <tr>
+            <th>Naam drone</th>
+            <th>Mac_adres drone</th>
+            <th>id file</th>
+            <th>Eerste record</th>
+            <th>Laatste Record</th>
+        </tr>
+    </table>
+</div>
+</body>
+</html>
